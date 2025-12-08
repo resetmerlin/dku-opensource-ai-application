@@ -2,6 +2,37 @@
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
+/* PDF-safe theme – only old-style colors */
+.pdf-root {
+  /* force a simple, safe palette */
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+/* If you’re using CSS variables for colors elsewhere,
+   override them here with simple values (NO lab / color-mix). */
+
+.pdf-root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --muted: #e5e7eb;
+  --muted-foreground: #6b7280;
+  --primary: #2563eb;
+  --primary-foreground: #f9fafb;
+  --secondary: #64748b;
+  --secondary-foreground: #f9fafb;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #2563eb;
+}
+
+/* If your design system uses color-mix/in lab somewhere,
+   add a blunt override for the PDF subtree: */
+.pdf-root,
+.pdf-root * {
+  /* kill any advanced color functions coming from global styles */
+  background-image: none !important;
+}
 
 @theme inline {
   --color-background: var(--background);

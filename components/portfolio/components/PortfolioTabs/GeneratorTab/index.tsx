@@ -11,6 +11,7 @@ import { UploadContent } from './UploadContent'
 import { useResumePreview, useCreatePortfolio } from '@/components/portfolio/remote'
 import { Portfolio } from '@/types/portfolio'
 import { useQueryClient } from '@tanstack/react-query'
+import { PortfolioPDFExportButton } from '@/lib/generatePDF'
 
 const GeneratorTab = () => {
   const queryClient = useQueryClient()
@@ -82,7 +83,6 @@ const GeneratorTab = () => {
       } else {
         setGenerationProgress(100)
         setGenerationStage('Portfolio generation complete!')
-        setIsGenerating(false)
         setGenerationComplete(true)
         setEstimatedTime(0)
       }
@@ -97,22 +97,20 @@ const GeneratorTab = () => {
       if (result != null) {
         //@ts-ignore
         setGeneratedPortfolio(result.data || result)
-        // Invalidate portfolio queries to refetch the updated data
-        queryClient.invalidateQueries({ queryKey: ['portfolio'] })
       }
       // Ensure progress reaches 100% when API completes
       clearTimers()
       setGenerationProgress(100)
       setGenerationStage('Portfolio generation complete!')
-      setIsGenerating(false)
       setGenerationComplete(true)
       setEstimatedTime(0)
     } catch (error) {
       clearTimers()
-      setIsGenerating(false)
       setGenerationComplete(false)
       alert('Failed to generate portfolio. Please try again.')
       setShowGenerationModal(false)
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -417,23 +415,8 @@ const GeneratorTab = () => {
                         <Eye className="mr-2 h-4 w-4" />
                         View Portfolio
                       </Button>
-                      <Button
-                        onClick={() => handleDownloadPDF(generatedPortfolio || undefined)}
-                        disabled={isDownloadingPDF}
-                        className="flex-1 cursor-pointer whitespace-nowrap rounded-button bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-                      >
-                        {isDownloadingPDF ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Generating...
-                          </>
-                        ) : (
-                          <>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download PDF
-                          </>
-                        )}
-                      </Button>
+
+                      <PortfolioPDFExportButton portfolio={generatedPortfolio!} />
                     </div>
                     <Button
                       variant="outline"

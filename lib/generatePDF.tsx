@@ -1,210 +1,221 @@
-import { Document, Page, Text, View, pdf } from '@react-pdf/renderer'
-import { createTw } from 'react-pdf-tailwind'
-import { Portfolio } from '@/types/portfolio'
+'use client'
 
-// Create Tailwind instance with custom config
-const tw = createTw(
-  {
-    fontFamily: {
-      sans: ['Helvetica', 'Arial'],
-    },
-    colors: {
-      primary: '#3b82f6',
-      secondary: '#64748b',
-    },
-  },
-  {
-    ptPerRem: 12,
-  }
-)
+import { useMemo, useRef } from 'react'
+import type { Portfolio } from '@/types/portfolio'
+import { Button } from '@/components/ui/button'
+import { Download } from 'lucide-react'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 
-// Portfolio PDF Document Component
-const PortfolioPDF = ({ portfolio }: { portfolio: Portfolio }) => (
-  <Document>
-    <Page size="A4" style={tw('p-12 font-sans')}>
+type Props = {
+  portfolio: Portfolio
+  buttonClassName?: string
+}
+
+function PortfolioPDFContent({ portfolio }: { portfolio: Portfolio }) {
+  return (
+    <div className="w-[794px] min-h-[1123px] bg-white text-gray-900 p-12 font-sans ">
       {/* Header Section */}
-      <View style={tw('bg-slate-50 p-8 rounded-lg mb-6')}>
-        <View style={tw('flex-row gap-6 items-start')}>
+      <div className="bg-gray-100 p-8 rounded-lg mb-6">
+        <div className="flex flex-row gap-6 items-start">
           {/* Profile Info */}
-          <View style={tw('flex-1')}>
-            <Text style={tw('text-4xl font-bold text-slate-900 mb-2')}>
-              {portfolio.profile.name}
-            </Text>
-            <Text style={tw('text-xl text-primary font-semibold mb-4')}>
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">{portfolio.profile.name}</h1>
+
+            {/* PURE HEX COLOR — NO lab(), NO color-mix */}
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#3b82f6' }}>
               {portfolio.profile.title}
-            </Text>
-            <Text style={tw('text-gray-700 text-sm leading-relaxed')}>
-              {portfolio.profile.bio}
-            </Text>
-          </View>
-        </View>
-      </View>
+            </h2>
+
+            <p className="text-gray-700 text-sm leading-relaxed">{portfolio.profile.bio}</p>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <View style={tw('flex-row gap-6')}>
-        {/* Left Column - Career Timeline */}
-        <View style={tw('flex-1')}>
-          <Text style={tw('text-2xl font-bold text-primary mb-4')}>
+      <div className="flex flex-row gap-6">
+        {/* LEFT COLUMN */}
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold mb-4" style={{ color: '#3b82f6' }}>
             CAREER TIMELINE
-          </Text>
+          </h3>
 
-          {portfolio.careerTimeline.map((item, index) => (
-            <View key={item.id || index} style={tw('mb-6')}>
-              <View style={tw('flex-row justify-between items-start mb-2')}>
-                <View style={tw('flex-1')}>
-                  <Text style={tw('text-base font-bold text-slate-900')}>
-                    {item.title}
-                  </Text>
-                  <Text style={tw('text-sm text-gray-600')}>{item.company}</Text>
-                </View>
-                <Text style={tw('text-sm text-gray-500')}>{item.year}</Text>
-              </View>
+          {portfolio.careerTimeline.map((item, i) => (
+            <div key={item.id || i} className="mb-6">
+              <div className="flex flex-row justify-between items-start mb-2">
+                <div className="flex-1">
+                  <p className="text-base font-bold text-gray-900">{item.title}</p>
+                  <p className="text-sm text-gray-600">{item.company}</p>
+                </div>
+                <p className="text-sm text-gray-500">{item.year}</p>
+              </div>
+
               {item.description && (
-                <Text style={tw('text-sm text-gray-700 leading-relaxed')}>
-                  {item.description}
-                </Text>
+                <p className="text-sm text-gray-700 leading-relaxed">{item.description}</p>
               )}
-            </View>
+            </div>
           ))}
 
           {/* Featured Projects */}
-          {portfolio.featuredProjects && portfolio.featuredProjects.length > 0 && (
-            <View style={tw('mt-8')}>
-              <Text style={tw('text-2xl font-bold text-primary mb-4')}>
+          {portfolio.featuredProjects?.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-2xl font-bold mb-4" style={{ color: '#3b82f6' }}>
                 FEATURED PROJECTS
-              </Text>
-              {portfolio.featuredProjects.map((project, index) => (
-                <View key={project.id || index} style={tw('mb-6')}>
-                  <Text style={tw('text-base font-bold text-slate-900 mb-2')}>
-                    {project.title}
-                  </Text>
-                  <Text style={tw('text-sm text-gray-700 leading-relaxed')}>
-                    {project.description}
-                  </Text>
-                  {project.technologies && project.technologies.length > 0 && (
-                    <View style={tw('flex-row flex-wrap gap-2 mt-2')}>
-                      {project.technologies.map((tech, techIndex) => (
-                        <Text
-                          key={techIndex}
-                          style={tw('text-xs bg-slate-200 px-2 py-1 rounded')}
-                        >
-                          {tech}
-                        </Text>
-                      ))}
-                    </View>
-                  )}
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
+              </h3>
 
-        {/* Right Sidebar */}
-        <View style={tw('w-64 bg-slate-50 p-6 rounded-lg')}>
-          {/* Core Skills */}
-          <View style={tw('mb-6')}>
-            <Text style={tw('text-lg font-bold text-slate-900 mb-3')}>
-              CORE SKILLS
-            </Text>
-            <View style={tw('flex flex-col gap-2')}>
-              {portfolio.coreSkills.map((skill, index) => (
-                <Text key={index} style={tw('text-sm text-slate-700')}>
-                  • {typeof skill === 'string' ? skill : skill.name}
-                </Text>
+              {portfolio.featuredProjects.map((p, i) => (
+                <div key={p.id || i} className="mb-6">
+                  <p className="text-base font-bold text-gray-900 mb-2">{p.title}</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{p.description}</p>
+
+                  {p.technologies && p.technologies?.length > 0 && (
+                    <div className="flex flex-row flex-wrap gap-2 mt-2">
+                      {p.technologies.map((tech, t) => (
+                        <span key={t} className="text-xs bg-gray-200 px-2 py-1 rounded">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
-            </View>
-          </View>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT SIDEBAR */}
+        <aside className="w-64 bg-gray-100 p-6 rounded-lg">
+          {/* Core Skills */}
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-3">CORE SKILLS</h3>
+            <div className="flex flex-col gap-2">
+              {portfolio.coreSkills.map((s, i) => (
+                <p key={i} className="text-sm text-gray-700">
+                  • {typeof s === 'string' ? s : s.name}
+                </p>
+              ))}
+            </div>
+          </div>
 
           {/* Suggested Skills */}
-          {portfolio.suggestedSkills && portfolio.suggestedSkills.length > 0 && (
-            <View style={tw('mb-6')}>
-              <Text style={tw('text-lg font-bold text-slate-900 mb-3')}>
-                SUGGESTED SKILLS
-              </Text>
-              <View style={tw('flex-row flex-wrap gap-2')}>
-                {portfolio.suggestedSkills.map((skill, index) => (
-                  <Text
-                    key={index}
-                    style={tw('text-xs bg-slate-200 px-3 py-1 rounded')}
-                  >
+          {portfolio.suggestedSkills?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-3">SUGGESTED SKILLS</h3>
+              <div className="flex flex-row flex-wrap gap-2">
+                {portfolio.suggestedSkills.map((skill, i) => (
+                  <span key={i} className="text-xs bg-gray-200 px-3 py-1 rounded">
                     {skill}
-                  </Text>
+                  </span>
                 ))}
-              </View>
-            </View>
+              </div>
+            </div>
           )}
 
           {/* Statistics */}
-          <View style={tw('mb-6')}>
-            <Text style={tw('text-lg font-bold text-slate-900 mb-3')}>
-              STATISTICS
-            </Text>
-            <View style={tw('text-sm text-slate-700')}>
-              <View style={tw('flex-row justify-between mb-2')}>
-                <Text>Years of Career:</Text>
-                <Text style={tw('font-semibold')}>
-                  {portfolio.profile.stats.yearsOfCareer || 0}
-                </Text>
-              </View>
-              <View style={tw('flex-row justify-between mb-2')}>
-                <Text>Projects:</Text>
-                <Text style={tw('font-semibold')}>
-                  {portfolio.profile.stats.projects || 0}
-                </Text>
-              </View>
-            </View>
-          </View>
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-3">STATISTICS</h3>
+            <div className="text-sm text-gray-700">
+              <div className="flex justify-between mb-2">
+                <span>Years of Career:</span>
+                <span className="font-semibold">{portfolio.profile.stats.yearsOfCareer || 0}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Projects:</span>
+                <span className="font-semibold">{portfolio.profile.stats.projects || 0}</span>
+              </div>
+            </div>
+          </div>
 
-          {/* Achievement Badges */}
-          {portfolio.achievementBadges && portfolio.achievementBadges.length > 0 && (
-            <View style={tw('mb-6')}>
-              <Text style={tw('text-lg font-bold text-slate-900 mb-3')}>
-                ACHIEVEMENTS
-              </Text>
-              <View style={tw('flex flex-col gap-2')}>
-                {portfolio.achievementBadges.map((badge, index) => (
-                  <Text key={index} style={tw('text-sm text-slate-700')}>
-                    🏆 {badge.title}
-                  </Text>
+          {/* Achievements */}
+          {portfolio.achievementBadges?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-3">ACHIEVEMENTS</h3>
+              <div className="flex flex-col gap-2">
+                {portfolio.achievementBadges.map((b, i) => (
+                  <p key={i} className="text-sm text-gray-700">
+                    🏆 {b.title}
+                  </p>
                 ))}
-              </View>
-            </View>
+              </div>
+            </div>
           )}
-        </View>
-      </View>
+        </aside>
+      </div>
 
       {/* Footer */}
-      <View
-        style={tw('absolute bottom-0 left-0 right-0 text-center p-4 border-t border-slate-200')}
-      >
-        <Text style={tw('text-secondary text-sm font-semibold')}>
-          Generated by Portfolio AI
-        </Text>
-      </View>
-    </Page>
-  </Document>
-)
+      <footer className="absolute bottom-0 left-0 right-0 text-center p-4 border-t border-gray-300">
+        <p className="text-gray-600 text-sm font-semibold">Generated by Portfolio AI</p>
+      </footer>
+    </div>
+  )
+}
 
-export async function generatePortfolioPDF(portfolio: Portfolio) {
-  try {
-    // Generate the PDF blob
-    const blob = await pdf(<PortfolioPDF portfolio={portfolio} />).toBlob()
+/**
+ * Export button + hidden PDF template.
+ * Drop this where you previously called generatePortfolioPDF(portfolio).
+ */
+export function PortfolioPDFExportButton({ portfolio, buttonClassName }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null)
 
-    // Create a download link
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${portfolio.profile.name.replace(/\s+/g, '_')}_Portfolio.pdf`
+  const filename = useMemo(
+    () => `${portfolio.profile.name.replace(/\s+/g, '_')}_Portfolio.pdf`,
+    [portfolio.profile.name]
+  )
 
-    // Trigger download
-    document.body.appendChild(link)
-    link.click()
+  const handleDownload = async () => {
+    const element = containerRef.current
+    if (!element) return
 
-    // Cleanup
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Error generating PDF:', error)
-    throw error
+    // Convert HTML → Canvas
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'px',
+      format: 'a4',
+    })
+
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    const pdfHeight = pdf.internal.pageSize.getHeight()
+
+    // Fit the canvas image into A4
+    const ratio = canvas.width / canvas.height
+    const height = pdfWidth / ratio
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, height)
+    pdf.save(filename)
   }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* HIDDEN HTML TO CAPTURE */}
+      <div
+        ref={containerRef}
+        style={{
+          position: 'fixed',
+          top: '-9999px',
+          left: '-9999px',
+        }}
+      >
+        <PortfolioPDFContent portfolio={portfolio} />
+      </div>
+
+      {/* Download Button */}
+      <Button
+        onClick={handleDownload}
+        className={
+          buttonClassName ?? 'flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700'
+        }
+      >
+        <Download className="h-4 w-4" />
+        Download PDF
+      </Button>
+    </div>
+  )
 }
