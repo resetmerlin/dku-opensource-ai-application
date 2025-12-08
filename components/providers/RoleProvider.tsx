@@ -93,12 +93,14 @@ export const RoleProvider = ({ children }: RoleProviderProps) => {
   }
 
   useLayoutEffect(() => {
+    if (role == null) return
+
     if (pathname == '/hub' && role === 'recruiter') return
     if (pathname.startsWith('/portfolio') && !pathname.endsWith('me') && role === 'recruiter')
       return
 
     router.replace('/portfolio/me')
-  }, [router, pathname])
+  }, [router, pathname, role])
 
   const value: RoleContextType = {
     role,
