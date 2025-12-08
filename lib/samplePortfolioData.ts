@@ -1,0 +1,211 @@
+import type { Portfolio } from '@/types/portfolio'
+
+export const generateSamplePortfolio = (userId: string, name: string = 'Sarah Chen'): Omit<Portfolio, '_id'> => {
+  return {
+    userId,
+    profile: {
+      userId,
+      name,
+      title: 'Senior Product Designer & AI Innovation Strategist',
+      bio: 'Passionate product designer with 8+ years of experience creating user-centered digital experiences. Specialized in AI-powered design tools and emerging technologies. Led design teams at three successful startups, resulting in 40% increase in user engagement and $2M+ in additional revenue.',
+      avatar: '',
+      stats: {
+        followers: 2400,
+        endorsements: 156,
+        projects: 89,
+      },
+    },
+    coreSkills: [
+      { name: 'UI/UX Design', level: 'expert' },
+      { name: 'Product Strategy', level: 'advanced' },
+      { name: 'AI Integration', level: 'advanced' },
+      { name: 'User Research', level: 'expert' },
+      { name: 'Prototyping', level: 'expert' },
+      { name: 'Design Systems', level: 'advanced' },
+    ],
+    featuredProjects: [
+      {
+        id: 'proj-001',
+        title: 'AI Design Assistant',
+        description: 'Revolutionary AI-powered design tool',
+        technologies: ['React', 'TypeScript', 'AI/ML'],
+        status: 'completed',
+      },
+      {
+        id: 'proj-002',
+        title: 'Healthcare Dashboard',
+        description: 'Patient management system',
+        technologies: ['Next.js', 'Node.js', 'MongoDB'],
+        status: 'completed',
+      },
+      {
+        id: 'proj-003',
+        title: 'E-commerce Platform',
+        description: '60% conversion increase',
+        technologies: ['React', 'GraphQL', 'AWS'],
+        status: 'completed',
+      },
+      {
+        id: 'proj-004',
+        title: 'Mobile Banking App',
+        description: 'Financial management solution',
+        technologies: ['React Native', 'Firebase'],
+        status: 'completed',
+      },
+    ],
+    careerTimeline: [
+      {
+        id: 'career-001',
+        year: '2024',
+        title: 'Senior Product Designer',
+        company: 'TechFlow Inc',
+        isCurrent: true,
+      },
+      {
+        id: 'career-002',
+        year: '2022',
+        title: 'Lead Designer',
+        company: 'InnovateLab',
+      },
+      {
+        id: 'career-003',
+        year: '2019',
+        title: 'Product Designer',
+        company: 'StartupXYZ',
+      },
+      {
+        id: 'career-004',
+        year: '2016',
+        title: 'UI Designer',
+        company: 'DesignStudio',
+      },
+    ],
+    achievementBadges: [
+      {
+        id: 'badge-001',
+        title: 'Design Award',
+        icon: 'Trophy',
+        description: 'Awarded for outstanding design work',
+      },
+      {
+        id: 'badge-002',
+        title: 'Top Performer',
+        icon: 'Star',
+        description: 'Recognized as top performer of the year',
+      },
+      {
+        id: 'badge-003',
+        title: 'Team Leader',
+        icon: 'Users',
+        description: 'Led successful cross-functional teams',
+      },
+      {
+        id: 'badge-004',
+        title: 'Innovation',
+        icon: 'Lightbulb',
+        description: 'Innovative solutions and approaches',
+      },
+    ],
+    performanceMetrics: [
+      {
+        label: 'Projects Completed',
+        value: '156',
+        icon: 'CheckCircle',
+        change: 12,
+        trend: 'up',
+      },
+      {
+        label: 'Client Satisfaction',
+        value: '98%',
+        icon: 'Smile',
+        change: 2,
+        trend: 'up',
+      },
+      {
+        label: 'Team Members Led',
+        value: '24',
+        icon: 'Users',
+        change: 5,
+        trend: 'up',
+      },
+      {
+        label: 'Awards Received',
+        value: '8',
+        icon: 'Trophy',
+        change: 1,
+        trend: 'up',
+      },
+    ],
+    feedPosts: [
+      {
+        id: 'post-001',
+        user: 'Alex Rodriguez',
+        role: 'Product Manager',
+        time: '2 hours ago',
+        content:
+          'Just launched our new AI-powered design system! The collaboration between design and engineering teams has been incredible. Excited to see how this will streamline our workflow.',
+        likes: 24,
+        comments: 8,
+        aiTag: 'AI-Enhanced',
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      },
+      {
+        id: 'post-002',
+        user: 'Maria Santos',
+        role: 'UX Researcher',
+        time: '5 hours ago',
+        content:
+          'Fascinating insights from our latest user research study. Users are 3x more likely to engage with personalized AI recommendations. The future of UX is definitely human-AI collaboration.',
+        likes: 18,
+        comments: 12,
+        aiTag: 'Data Insights',
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
+      },
+      {
+        id: 'post-003',
+        user: 'David Kim',
+        role: 'Design Director',
+        time: '1 day ago',
+        content:
+          'Attending the AI Design Summit next week. Looking forward to connecting with fellow designers and exploring how AI is transforming our industry. Who else will be there?',
+        likes: 31,
+        comments: 15,
+        aiTag: 'Innovation',
+        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      },
+    ],
+    uploadedFiles: [
+      {
+        id: 'file-001',
+        filename: 'Resume_2024.pdf',
+        url: '/uploads/resume_2024.pdf',
+        uploadDate: new Date(),
+        size: 245678,
+        type: 'application/pdf',
+      },
+      {
+        id: 'file-002',
+        filename: 'Portfolio_Projects.zip',
+        url: '/uploads/portfolio_projects.zip',
+        uploadDate: new Date(),
+        size: 5678901,
+        type: 'application/zip',
+      },
+      {
+        id: 'file-003',
+        filename: 'Certificates.pdf',
+        url: '/uploads/certificates.pdf',
+        uploadDate: new Date(),
+        size: 1234567,
+        type: 'application/pdf',
+      },
+    ],
+    suggestedSkills: ['Product Design', 'AI/ML', 'User Research', 'Prototyping', 'Leadership'],
+    portfolioLayouts: [
+      { id: 'layout-001', name: 'Modern Minimal', isActive: true },
+      { id: 'layout-002', name: 'Creative Bold', isActive: false },
+      { id: 'layout-003', name: 'Professional Classic', isActive: false },
+      { id: 'layout-004', name: 'Tech Focused', isActive: false },
+    ],
+  }
+}
