@@ -18,14 +18,13 @@ export async function updatePortfolioHandler(request: NextRequest) {
     if (!existing) {
       return createErrorResponse('Portfolio not found', 404)
     }
+    console.log(existing)
+    console.log(body)
 
     // Update the portfolio
     const portfolio = await savePortfolio(userId, {
+      ...existing,
       ...body,
-      profile: {
-        ...body.profile,
-        userId,
-      },
     })
 
     return createSuccessResponse(portfolio, 'Portfolio updated successfully')

@@ -1,18 +1,19 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Portfolio } from '@/types/portfolio'
 import { Button } from '@/components/ui/button'
 import { Download } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import { Spinner } from '@/components/ui/spinner'
 
 type Props = {
   portfolio: Portfolio
   buttonClassName?: string
 }
 
-function PortfolioPDFContent({ portfolio }: { portfolio: Portfolio }) {
+export function PortfolioPDFContent({ portfolio }: { portfolio: Portfolio }) {
   return (
     <div className="w-[794px] min-h-[1123px] bg-white text-gray-900 p-12 font-sans ">
       {/* Header Section */}
@@ -155,65 +156,45 @@ function PortfolioPDFContent({ portfolio }: { portfolio: Portfolio }) {
  * Drop this where you previously called generatePortfolioPDF(portfolio).
  */
 export function PortfolioPDFExportButton({ portfolio, buttonClassName }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const filename = useMemo(
-    () => `${portfolio.profile.name.replace(/\s+/g, '_')}_Portfolio.pdf`,
-    [portfolio.profile.name]
-  )
+  const [loading, setLoading] = useState(false)
 
   const handleDownload = async () => {
-    const element = containerRef.current
-    if (!element) return
+    try {
+      setLoading(true)
+      const res = await fetch('/api/portfolioPdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
 
-    // Convert HTML → Canvas
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-    })
+      if (!res.ok) {
+        throw new Error('Failed to generate PDF')
+      }
 
-    const imgData = canvas.toDataURL('image/png')
-
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'px',
-      format: 'a4',
-    })
-
-    const pdfWidth = pdf.internal.pageSize.getWidth()
-    const pdfHeight = pdf.internal.pageSize.getHeight()
-
-    // Fit the canvas image into A4
-    const ratio = canvas.width / canvas.height
-    const height = pdfWidth / ratio
-
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, height)
-    pdf.save(filename)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `portfolio.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error(err)
+      // TODO: show toast
+    } finally {
+      setLoading(false)
+    }
   }
-
   return (
     <div className="flex flex-col gap-4">
-      {/* HIDDEN HTML TO CAPTURE */}
-      <div
-        ref={containerRef}
-        style={{
-          position: 'fixed',
-          top: '-9999px',
-          left: '-9999px',
-        }}
-      >
-        <PortfolioPDFContent portfolio={portfolio} />
-      </div>
-
       {/* Download Button */}
       <Button
         onClick={handleDownload}
+        disabled={loading}
         className={
           buttonClassName ?? 'flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700'
         }
       >
-        <Download className="h-4 w-4" />
+        {loading ? <Spinner /> : <Download className="h-4 w-4" />}
         Download PDF
       </Button>
     </div>

@@ -1,5 +1,7 @@
+'use server'
+
 import HubPage from '@/components/hub/HubPage'
 
-export default function Page() {
+export default async function Page() {
   return <HubPage />
 }

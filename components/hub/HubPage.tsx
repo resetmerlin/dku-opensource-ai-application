@@ -47,6 +47,8 @@ import { portfolios as fallbackPortfolios } from './data'
 import { Header } from './Header'
 import { usePortfolios } from '@/hooks/usePortfolios'
 import { useRouter } from 'next/navigation'
+import { useRole } from '../providers/RoleProvider'
+import Loader from '../portfolio/components/Loader'
 
 const HubPage: React.FC = () => {
   const router = useRouter()
@@ -88,6 +90,11 @@ const HubPage: React.FC = () => {
     const portfolioId = portfolio.portfolioId || portfolio.id
     router.push(`/portfolio/${portfolioId}`)
   }
+
+  const { role } = useRole()
+
+  if (role == null) return <Loader />
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header>

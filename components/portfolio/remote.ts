@@ -48,6 +48,21 @@ export function useCreatePortfolio() {
   })
 }
 
+export function updatePortfolio(data: any) {
+  return apiClient.put<ApiResponse<Portfolio>>('/portfolio', data, {
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+export function useUpdatePortfolio() {
+  return useMutation<ApiResponse<Portfolio>, Error, File>({
+    mutationKey: ['/api/portfolio'],
+    mutationFn: async (data: any) => {
+      return await updatePortfolio(data)
+    },
+  })
+}
+
 export function useResumePreview() {
   const [resumePreview, setResumePreview] = useState<{
     professionalSummary: string

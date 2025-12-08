@@ -8,6 +8,7 @@ import { FileText, Image as ImageIcon, X } from 'lucide-react'
 import { useMutateResumeUpload } from '@/components/portfolio/remote'
 import { UseMutateFunction } from '@tanstack/react-query'
 import { ApiResponse } from '@/lib/apiClient'
+import { Spinner } from '@/components/ui/spinner'
 
 const formatFileSize = (bytes: number) => {
   const units = ['B', 'KB', 'MB', 'GB']
@@ -125,6 +126,7 @@ export function UploadContent(uploadlogic: {
             disabled={uploadlogic.isUploading}
             onClick={() => uploadlogic.uploadResume(pdfFile)}
           >
+            {uploadlogic.isUploading && <Spinner />}
             <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-gradient-to-r from-blue-600/10 to-transparent" />
             <span className="relative z-10">Show Preview</span>
           </Button>

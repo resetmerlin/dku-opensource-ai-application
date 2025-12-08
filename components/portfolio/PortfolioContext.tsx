@@ -35,8 +35,12 @@ type PortfolioContextType = {
   activeTab: string
   setActiveTab: (tab: string) => void
   displayCoreSkills: string[]
-  displayFeaturedProjects: Array<{ title: string; desc: string }>
-  displayCareerTimeline: Array<{ year: string; title: string; company: string }>
+  displayFeaturedProjects: Array<{
+    title: string
+    desc: string
+    imageUrl?: string
+  }>
+  displayCareerTimeline: Array<{ id?: string; year: string; title: string; company: string }>
   displayAchievementBadges: Array<{ icon: LucideIcon; title: string }>
   displayPerformanceMetrics: Array<{ label: string; value: string; icon: LucideIcon }>
   displayFeedPosts: Array<{
@@ -52,6 +56,7 @@ type PortfolioContextType = {
   displaySuggestedSkills: string[]
   displayPortfolioLayouts: number[]
   showFirstOnboarding: boolean
+  isMyPortfolio: boolean
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined)
@@ -73,16 +78,18 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
   const { user } = useClerk()
 
   const showFirstOnboarding = !user && !portfolio
+  const isMyPortfolio = portfolio?.userId === user?.id
 
   const displayCoreSkills =
     portfolio?.coreSkills?.map((skill) => (typeof skill === 'string' ? skill : skill.name)) ||
     defaultCoreSkills
 
   const displayFeaturedProjects =
-    portfolio?.featuredProjects?.map((proj) => ({
-      title: proj.title,
-      desc: proj.description,
-    })) || defaultFeaturedProjects
+    portfolio?.featuredProjects?.map((project) => ({
+      title: project.title,
+      desc: project.description,
+      imageUrl: project.imageUrl,
+    })) || []
 
   const displayCareerTimeline = portfolio?.careerTimeline || defaultCareerTimeline
 
@@ -133,6 +140,7 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
     displaySuggestedSkills,
     displayPortfolioLayouts,
     showFirstOnboarding,
+    isMyPortfolio,
   }
 
   return <PortfolioContext.Provider value={value}>{children}</PortfolioContext.Provider>

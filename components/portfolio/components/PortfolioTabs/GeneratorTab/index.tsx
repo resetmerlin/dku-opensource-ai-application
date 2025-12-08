@@ -12,6 +12,8 @@ import { useResumePreview, useCreatePortfolio } from '@/components/portfolio/rem
 import { Portfolio } from '@/types/portfolio'
 import { useQueryClient } from '@tanstack/react-query'
 import { PortfolioPDFExportButton } from '@/lib/generatePDF'
+import { PORTFOLIO_QUERY_KEY } from '@/hooks/usePortfolio'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const GeneratorTab = () => {
   const queryClient = useQueryClient()
@@ -97,6 +99,8 @@ const GeneratorTab = () => {
       if (result != null) {
         //@ts-ignore
         setGeneratedPortfolio(result.data || result)
+
+        queryClient.invalidateQueries({ queryKey: [PORTFOLIO_QUERY_KEY] })
       }
       // Ensure progress reaches 100% when API completes
       clearTimers()
@@ -235,15 +239,33 @@ const GeneratorTab = () => {
                   </Badge>
                 </div>
                 <p className="leading-relaxed text-slate-700">
-                  {uploadlogic.resumePreview && uploadlogic.resumePreview?.professionalSummary}
+                  {uploadlogic.isUploading ? (
+                    <>
+                      <Skeleton className="w-full h-20 mb-2" />
+                      <Skeleton className="w-full h-7 mb-2" />
+                      <Skeleton className="w-9/12 h-6" />
+                    </>
+                  ) : (
+                    ((uploadlogic.resumePreview &&
+                      uploadlogic.resumePreview?.professionalSummary) ??
+                    'A short, polished introduction that highlights who you are and what you do — generated automatically from your resume.')
+                  )}
                 </p>
               </Card>
 
               <Card className="rounded-lg border border-gray-200 bg-white p-6">
                 <h3 className="mb-4 font-medium text-slate-900">Suggested Skills</h3>
                 <div className="flex flex-wrap gap-2">
-                  {uploadlogic.resumePreview &&
-                    uploadlogic.resumePreview?.suggestedSkills.map((skill) => (
+                  {uploadlogic.isUploading ? (
+                    <>
+                      <Skeleton className="w-20 h-6 mb-3" />
+                      <Skeleton className="w-17 h-6 mb-3" />
+                      <Skeleton className="w-29 h-6 mb-3" />
+                      <Skeleton className="w-30 h-6 mb-3" />
+                      <Skeleton className="w-20 h-6 mb-3" />
+                    </>
+                  ) : (
+                    (uploadlogic.resumePreview?.suggestedSkills.map((skill) => (
                       <Badge
                         key={skill}
                         variant="outline"
@@ -251,7 +273,9 @@ const GeneratorTab = () => {
                       >
                         {skill}
                       </Badge>
-                    ))}
+                    )) ??
+                    'A curated list of skills extracted from your resume to help strengthen your profile and showcase your capabilities.')
+                  )}
                 </div>
               </Card>
 

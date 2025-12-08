@@ -8,6 +8,7 @@ import { promises as fs } from 'fs'
 import os from 'os'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
+import { createPortfolioPdf } from '@/lib/portfolioPdf'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,

@@ -1,9 +1,17 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  type ReactNode,
+} from 'react'
 import { useUser } from '@clerk/nextjs'
 import apiClient from '@/lib/apiClient'
 import RoleSelectionModal from '@/components/onboarding/RoleSelectionModal'
+import { usePathname, useRouter } from 'next/navigation'
 
 type UserRole = 'recruiter' | 'job-seeker' | null
 
@@ -20,14 +28,16 @@ type RoleProviderProps = {
 }
 
 export const RoleProvider = ({ children }: RoleProviderProps) => {
+  const router = useRouter()
   const { user, isLoaded } = useUser()
   const [role, setRoleState] = useState<UserRole>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const pathname = usePathname()
 
   // Fetch user role on mount
-  useEffect(() => {
+  useLayoutEffect(() => {
     const fetchRole = async () => {
       if (!isLoaded) return
 
@@ -81,6 +91,14 @@ export const RoleProvider = ({ children }: RoleProviderProps) => {
       setIsSubmitting(false)
     }
   }
+
+  useLayoutEffect(() => {
+    if (pathname == '/hub' && role === 'recruiter') return
+    if (pathname.startsWith('/portfolio') && !pathname.endsWith('me') && role === 'recruiter')
+      return
+
+    router.replace('/portfolio/me')
+  }, [router, pathname])
 
   const value: RoleContextType = {
     role,

@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '@/lib/apiClient'
 import type { Portfolio, PortfolioResponse } from '@/types/portfolio'
 
-const PORTFOLIO_QUERY_KEY = 'portfolio'
+export const PORTFOLIO_QUERY_KEY = 'portfolio'
 
 /**
  * Fetch a portfolio by its ID (publicly accessible)

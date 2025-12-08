@@ -13,7 +13,15 @@ export function Header({ children }: { children?: ReactNode }) {
       <div className="mx-auto flex w-[88vw] items-center">
         <div className="flex items-center space-x-3">
           <div className="h-8 w-8 rounded bg-white p-1 flex items-center justify-center">
-            <Image src="/logo.png" alt="ProCraft Logo" width={32} height={32} className="object-contain" />
+            <Link href={'/'}>
+              <Image
+                src="/logo.png"
+                alt="ProCraft Logo"
+                width={45}
+                height={45}
+                className="object-contain"
+              />
+            </Link>
           </div>
           <span className="text-lg font-medium text-slate-900">ProCraft</span>
         </div>
