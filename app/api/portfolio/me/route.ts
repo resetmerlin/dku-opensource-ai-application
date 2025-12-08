@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import connectDatabase from '@/db/connectDatabase'
-import PortfolioModel from '@/db/models/Portfolio'
+import { getPortfolioByUserId } from '@/lib/db/fakePortfolioDB'
 import type { PortfolioResponse } from '@/types/portfolio'
 
 export async function GET() {
@@ -18,9 +17,7 @@ export async function GET() {
       )
     }
 
-    await connectDatabase()
-
-    const portfolio = await PortfolioModel.findOne({ userId }).lean()
+    const portfolio = await getPortfolioByUserId(userId)
 
     if (!portfolio) {
       return NextResponse.json(
@@ -34,10 +31,7 @@ export async function GET() {
 
     const response: PortfolioResponse = {
       success: true,
-      data: {
-        ...portfolio,
-        _id: portfolio._id.toString(),
-      },
+      data: portfolio,
     }
 
     return NextResponse.json(response, { status: 200 })

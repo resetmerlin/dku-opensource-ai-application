@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import PortfolioModel from '@/db/models/Portfolio'
-import { createErrorResponse, ensureDbConnection, handleError } from './utils'
+import { getPortfolioByUserId, deletePortfolioById } from '@/lib/db/fakePortfolioDB'
+import { createErrorResponse, handleError } from './utils'
 
 export async function deletePortfolioHandler(request: NextRequest) {
   try {
@@ -12,13 +12,15 @@ export async function deletePortfolioHandler(request: NextRequest) {
       return createErrorResponse('Unauthorized - Please sign in to delete your portfolio', 401)
     }
 
-    await ensureDbConnection()
-
-    const portfolio = await PortfolioModel.findOneAndDelete({ userId })
+    // Find portfolio by userId first
+    const portfolio = await getPortfolioByUserId(userId)
 
     if (!portfolio) {
       return createErrorResponse('Portfolio not found', 404)
     }
+
+    // Delete by portfolio ID
+    await deletePortfolioById(portfolio._id)
 
     return NextResponse.json(
       {

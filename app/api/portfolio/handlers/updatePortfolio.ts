@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import PortfolioModel from '@/db/models/Portfolio'
-import { createErrorResponse, createSuccessResponse, ensureDbConnection, handleError } from './utils'
+import { savePortfolio, getPortfolioByUserId } from '@/lib/db/fakePortfolioDB'
+import { createErrorResponse, createSuccessResponse, handleError } from './utils'
 
 export async function updatePortfolioHandler(request: NextRequest) {
   try {
@@ -11,33 +11,24 @@ export async function updatePortfolioHandler(request: NextRequest) {
       return createErrorResponse('Unauthorized - Please sign in to update your portfolio', 401)
     }
 
-    await ensureDbConnection()
-
     const body = await request.json()
 
-    const portfolio = await PortfolioModel.findOneAndUpdate(
-      { userId },
-      {
-        ...body,
-        profile: {
-          ...body.profile,
-          userId,
-        },
-      },
-      { new: true, runValidators: true }
-    )
-
-    if (!portfolio) {
+    // Check if portfolio exists first
+    const existing = await getPortfolioByUserId(userId)
+    if (!existing) {
       return createErrorResponse('Portfolio not found', 404)
     }
 
-    return createSuccessResponse(
-      {
-        ...portfolio.toObject(),
-        _id: portfolio._id.toString(),
+    // Update the portfolio
+    const portfolio = await savePortfolio(userId, {
+      ...body,
+      profile: {
+        ...body.profile,
+        userId,
       },
-      'Portfolio updated successfully'
-    )
+    })
+
+    return createSuccessResponse(portfolio, 'Portfolio updated successfully')
   } catch (error) {
     return handleError(error, 'updating portfolio')
   }

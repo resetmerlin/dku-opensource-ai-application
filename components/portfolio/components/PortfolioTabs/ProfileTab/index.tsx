@@ -10,38 +10,48 @@ import { usePortfolioContext } from '@/components/portfolio/PortfolioContext'
 
 const ProfileTab = () => {
   const {
+    portfolio,
     displayCoreSkills,
     displayFeaturedProjects,
     displayCareerTimeline,
     displayAchievementBadges,
   } = usePortfolioContext()
 
+  if (!portfolio) {
+    return <EmptyProfile />
+  }
+
+  const { profile } = portfolio
+  const initials = profile.name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+
   return (
     <div className="space-y-12">
       <div className="rounded-lg border border-gray-100 bg-white p-8">
         <div className="flex items-start space-x-8">
           <Avatar className="h-20 w-20">
-            <AvatarImage src="https://localhost/api/search-image?query=Professional%20headshot%20of%20a%20confident%20business%20person%20with%20a%20warm%20smile%20against%20a%20clean%20minimalist%20background%20with%20soft%20lighting%20and%20modern%20aesthetic&width=128&height=128&seq=profile001&orientation=squarish" />
+            {profile.avatar ? <AvatarImage src={profile.avatar} alt={profile.name} /> : null}
             <AvatarFallback className="bg-gray-100 text-lg font-medium text-gray-600">
-              SC
+              {initials}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <h1 className="mb-1 text-xl font-medium text-slate-900">Sarah Chen</h1>
-            <p className="mb-8 text-slate-500">
-              Senior Product Designer &amp; AI Innovation Strategist
-            </p>
+            <h1 className="mb-1 text-xl font-medium text-slate-900">{profile.name}</h1>
+            <p className="mb-8 text-slate-500">{profile.title}</p>
             <div className="flex items-center space-x-8">
               <div>
-                <div className="text-lg font-medium text-slate-900">2.4K</div>
-                <div className="text-xs text-slate-400">Followers</div>
+                <div className="text-lg font-medium text-slate-900">
+                  {profile.stats.yearsOfCareer || 0}
+                </div>
+                <div className="text-xs text-slate-400">Years of Career</div>
               </div>
               <div>
-                <div className="text-lg font-medium text-slate-900">156</div>
-                <div className="text-xs text-slate-400">Endorsements</div>
-              </div>
-              <div>
-                <div className="text-lg font-medium text-slate-900">89</div>
+                <div className="text-lg font-medium text-slate-900">
+                  {profile.stats.projects || 0}
+                </div>
                 <div className="text-xs text-slate-400">Projects</div>
               </div>
             </div>
@@ -65,12 +75,7 @@ const ProfileTab = () => {
           <h2 className="text-base font-medium text-slate-900">About</h2>
           <Badge className="rounded bg-gray-50 px-2 py-1 text-xs text-gray-500">AI Enhanced</Badge>
         </div>
-        <p className="text-sm leading-relaxed text-slate-600">
-          Passionate product designer with 8+ years of experience creating user-centered digital
-          experiences. Specialized in AI-powered design tools and emerging technologies. Led design
-          teams at three successful startups, resulting in 40% increase in user engagement and $2M+
-          in additional revenue.
-        </p>
+        <p className="text-sm leading-relaxed text-slate-600">{profile.bio}</p>
       </Card>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -90,7 +95,7 @@ const ProfileTab = () => {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-medium text-slate-900">Featured Projects</h3>
+            <h3 className="mb-4 text-sm font-medium text-slate-900">Featured Experiences</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {displayFeaturedProjects.map((project, index) => (
                 <Card

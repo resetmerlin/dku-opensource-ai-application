@@ -43,10 +43,16 @@ import {
   SiSlack,
   SiSpotify,
 } from 'react-icons/si'
-import { portfolios } from './data'
+import { portfolios as fallbackPortfolios } from './data'
 import { Header } from './Header'
+import { usePortfolios } from '@/hooks/usePortfolios'
+import { useRouter } from 'next/navigation'
 
 const HubPage: React.FC = () => {
+  const router = useRouter()
+  const { data: apiPortfolios, isLoading } = usePortfolios()
+  const portfolios = apiPortfolios || fallbackPortfolios
+
   const [activeCategory, setActiveCategory] = useState('trending')
   const [selectedIndustry, setSelectedIndustry] = useState('all')
   const [selectedRole, setSelectedRole] = useState('all')
@@ -79,7 +85,8 @@ const HubPage: React.FC = () => {
     return matchesSearch && matchesIndustry && matchesRole && matchesCategory
   })
   const handlePortfolioClick = (portfolio: any) => {
-    window.open(`https://localhost/portfolio/${portfolio.id}`, '_blank')
+    const portfolioId = portfolio.portfolioId || portfolio.id
+    router.push(`/portfolio/${portfolioId}`)
   }
   return (
     <div className="min-h-screen bg-gray-50">

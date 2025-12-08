@@ -5,12 +5,20 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Check, Eye, FileText, Image as ImageIcon, Loader2, X } from 'lucide-react'
+import { Check, Eye, FileText, Image as ImageIcon, Loader2, X, Download } from 'lucide-react'
 import { usePortfolioContext } from '@/components/portfolio/PortfolioContext'
+import { UploadContent } from './UploadContent'
+import { useResumePreview, useCreatePortfolio } from '@/components/portfolio/remote'
+import { Portfolio } from '@/types/portfolio'
+import { useQueryClient } from '@tanstack/react-query'
 
 const GeneratorTab = () => {
-  const { displayUploadedFiles, displaySuggestedSkills, displayPortfolioLayouts } =
-    usePortfolioContext()
+  const queryClient = useQueryClient()
+  const { setActiveTab } = usePortfolioContext()
+
+  const [previewSummary, setPreviewSummary] = useState<string>()
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [generatedPortfolio, setGeneratedPortfolio] = useState<Portfolio | null>(null)
 
   const [showGenerationModal, setShowGenerationModal] = useState(false)
   const [generationProgress, setGenerationProgress] = useState(0)
@@ -18,14 +26,22 @@ const GeneratorTab = () => {
   const [estimatedTime, setEstimatedTime] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
   const [generationComplete, setGenerationComplete] = useState(false)
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false)
   const timeoutsRef = useRef<number[]>([])
+
+  const createPortfolioMutation = useCreatePortfolio()
 
   const clearTimers = () => {
     timeoutsRef.current.forEach((id) => clearTimeout(id))
     timeoutsRef.current = []
   }
 
-  const handleGeneratePortfolio = () => {
+  const handleGeneratePortfolio = async () => {
+    if (!uploadedFile) {
+      alert('Please upload a PDF file first')
+      return
+    }
+
     clearTimers()
     setShowGenerationModal(true)
     setIsGenerating(true)
@@ -45,6 +61,9 @@ const GeneratorTab = () => {
     let currentStage = 0
     const totalDuration = stages.reduce((sum, stage) => sum + stage.duration, 0)
     let elapsedTime = 0
+
+    // Start the actual API call
+    const portfolioPromise = createPortfolioMutation.mutateAsync(uploadedFile)
 
     const processStage = () => {
       if (currentStage < stages.length) {
@@ -70,6 +89,47 @@ const GeneratorTab = () => {
     }
 
     processStage()
+
+    // Wait for the actual API call to complete
+    try {
+      const result = await portfolioPromise
+      // Store the generated portfolio
+      if (result != null) {
+        //@ts-ignore
+        setGeneratedPortfolio(result.data || result)
+        // Invalidate portfolio queries to refetch the updated data
+        queryClient.invalidateQueries({ queryKey: ['portfolio'] })
+      }
+      // Ensure progress reaches 100% when API completes
+      clearTimers()
+      setGenerationProgress(100)
+      setGenerationStage('Portfolio generation complete!')
+      setIsGenerating(false)
+      setGenerationComplete(true)
+      setEstimatedTime(0)
+    } catch (error) {
+      clearTimers()
+      setIsGenerating(false)
+      setGenerationComplete(false)
+      alert('Failed to generate portfolio. Please try again.')
+      setShowGenerationModal(false)
+    }
+  }
+
+  const handleDownloadPDF = async (generatedPortfolio?: Portfolio) => {
+    if (!generatedPortfolio) {
+      alert('No portfolio data available')
+      return
+    }
+
+    setIsDownloadingPDF(true)
+    try {
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Failed to generate PDF. Please try again.')
+    } finally {
+      setIsDownloadingPDF(false)
+    }
   }
 
   const handleCloseModal = () => {
@@ -82,6 +142,17 @@ const GeneratorTab = () => {
   useEffect(() => {
     return () => clearTimers()
   }, [])
+
+  const uploadlogic = useResumePreview()
+
+  const handleFileChange = (file: File | null) => {
+    setUploadedFile(file)
+  }
+
+  const handleViewPortfolio = () => {
+    handleCloseModal()
+    setActiveTab('profile')
+  }
 
   return (
     <>
@@ -135,44 +206,7 @@ const GeneratorTab = () => {
 
         <div className="relative z-10 grid min-h-96 grid-cols-1 gap-12 lg:grid-cols-5">
           <div className="relative lg:col-span-2">
-            <div className="mb-8 flex items-center space-x-2">
-              <h2 className="text-lg font-medium text-slate-900">Upload Your Content</h2>
-              <div className="h-2 w-2 rotate-45 rounded-sm bg-blue-500/30" />
-              <div className="h-1 w-1 animate-pulse rounded-full bg-slate-300/50" />
-            </div>
-            <Card className="group relative cursor-pointer overflow-hidden rounded-lg border-2 border-dashed border-gray-200 bg-gray-50/80 p-8 backdrop-blur-sm transition-all duration-300 hover:border-blue-200 hover:bg-blue-50/30">
-              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-gradient-to-br from-blue-50/20 via-transparent to-slate-50/10" />
-              <div className="relative z-10 text-center">
-                <div className="relative mb-4 inline-block">
-                  <ImageIcon className="h-8 w-8 text-gray-400" />
-                  <div className="absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full bg-blue-400/60" />
-                </div>
-                <h3 className="mb-2 text-base font-medium text-slate-900">Drag &amp; Drop Files</h3>
-                <p className="mb-6 text-sm text-gray-500">
-                  Upload your resume, portfolio, or project files
-                </p>
-                <Button className="relative overflow-hidden rounded-button bg-slate-900 text-white hover:bg-slate-800">
-                  <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-gradient-to-r from-blue-600/10 to-transparent" />
-                  <span className="relative z-10">Choose Files</span>
-                </Button>
-              </div>
-            </Card>
-
-            <div className="mt-8 space-y-4">
-              <h4 className="font-medium text-slate-900">Uploaded Files</h4>
-              {displayUploadedFiles.map((file) => (
-                <div
-                  key={file}
-                  className="flex items-center justify-between rounded border border-gray-200 bg-white p-4 transition-colors hover:border-gray-300"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FileText className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm text-slate-900">{file}</span>
-                  </div>
-                  <Progress value={100} className="w-16" />
-                </div>
-              ))}
-            </div>
+            <UploadContent {...uploadlogic} onFileChange={handleFileChange} />
           </div>
 
           <div className="relative lg:col-span-3">
@@ -203,38 +237,23 @@ const GeneratorTab = () => {
                   </Badge>
                 </div>
                 <p className="leading-relaxed text-slate-700">
-                  Experienced product designer with expertise in AI integration and user-centered
-                  design. Proven track record of leading successful design initiatives and driving
-                  innovation.
+                  {uploadlogic.resumePreview && uploadlogic.resumePreview?.professionalSummary}
                 </p>
               </Card>
 
               <Card className="rounded-lg border border-gray-200 bg-white p-6">
                 <h3 className="mb-4 font-medium text-slate-900">Suggested Skills</h3>
                 <div className="flex flex-wrap gap-2">
-                  {displaySuggestedSkills.map((skill) => (
-                    <Badge
-                      key={skill}
-                      variant="outline"
-                      className="cursor-pointer rounded border-gray-200 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-gray-50"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </Card>
-
-              <Card className="rounded-lg border border-gray-200 bg-white p-6">
-                <h3 className="mb-4 font-medium text-slate-900">Portfolio Layout</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {displayPortfolioLayouts.map((item) => (
-                    <div
-                      key={item}
-                      className="flex aspect-video cursor-pointer items-center justify-center rounded border border-gray-200 bg-gray-50 transition-colors hover:bg-gray-100"
-                    >
-                      <ImageIcon className="h-5 w-5 text-gray-400" />
-                    </div>
-                  ))}
+                  {uploadlogic.resumePreview &&
+                    uploadlogic.resumePreview?.suggestedSkills.map((skill) => (
+                      <Badge
+                        key={skill}
+                        variant="outline"
+                        className="cursor-pointer rounded border-gray-200 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-gray-50"
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
                 </div>
               </Card>
 
@@ -387,20 +406,39 @@ const GeneratorTab = () => {
                 </div>
               </div>
 
-              <div className="flex space-x-3">
+              <div className="flex flex-col space-y-3">
                 {generationComplete ? (
                   <>
-                    <Button
-                      onClick={handleCloseModal}
-                      className="flex-1 cursor-pointer whitespace-nowrap rounded-button bg-slate-900 text-white hover:bg-slate-800"
-                    >
-                      <Eye className="mr-2 h-4 w-4" />
-                      View Portfolio
-                    </Button>
+                    <div className="flex space-x-3">
+                      <Button
+                        onClick={handleViewPortfolio}
+                        className="flex-1 cursor-pointer whitespace-nowrap rounded-button bg-slate-900 text-white hover:bg-slate-800"
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Portfolio
+                      </Button>
+                      <Button
+                        onClick={() => handleDownloadPDF(generatedPortfolio || undefined)}
+                        disabled={isDownloadingPDF}
+                        className="flex-1 cursor-pointer whitespace-nowrap rounded-button bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                      >
+                        {isDownloadingPDF ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download PDF
+                          </>
+                        )}
+                      </Button>
+                    </div>
                     <Button
                       variant="outline"
                       onClick={handleCloseModal}
-                      className="cursor-pointer whitespace-nowrap rounded-button border-gray-200 bg-white text-slate-600 hover:bg-gray-50"
+                      className="w-full cursor-pointer whitespace-nowrap rounded-button border-gray-200 bg-white text-slate-600 hover:bg-gray-50"
                     >
                       <Check className="mr-2 h-4 w-4" />
                       Close

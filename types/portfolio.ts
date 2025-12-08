@@ -5,9 +5,10 @@ export interface PortfolioProfile {
   bio: string
   avatar?: string
   stats: {
-    followers: number
-    endorsements: number
+    yearsOfCareer: number
     projects: number
+    followers?: number
+    endorsements?: number
   }
 }
 
@@ -95,8 +96,8 @@ export interface Portfolio {
   uploadedFiles: UploadedFile[]
   suggestedSkills: string[]
   portfolioLayouts: PortfolioLayout[]
-  createdAt?: Date
-  updatedAt?: Date
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface PortfolioResponse {

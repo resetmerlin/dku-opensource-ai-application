@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import connectDatabase from '@/db/connectDatabase'
 
 export const createErrorResponse = (message: string, status: number, error?: unknown) => {
   return NextResponse.json(
@@ -21,10 +20,6 @@ export const createSuccessResponse = <T>(data: T, message?: string, status: numb
     },
     { status }
   )
-}
-
-export const ensureDbConnection = async () => {
-  await connectDatabase()
 }
 
 export const handleError = (error: unknown, context: string) => {

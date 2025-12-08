@@ -1,11 +1,9 @@
 import { NextRequest } from 'next/server'
-import PortfolioModel from '@/db/models/Portfolio'
-import { createErrorResponse, createSuccessResponse, ensureDbConnection, handleError } from './utils'
+import { getPortfolioById } from '@/lib/db/fakePortfolioDB'
+import { createErrorResponse, createSuccessResponse, handleError } from './utils'
 
 export async function getPortfolioHandler(request: NextRequest) {
   try {
-    await ensureDbConnection()
-
     const searchParams = request.nextUrl.searchParams
     const portfolioId = searchParams.get('portfolioId')
 
@@ -13,16 +11,13 @@ export async function getPortfolioHandler(request: NextRequest) {
       return createErrorResponse('portfolioId parameter is required', 400)
     }
 
-    const portfolio = await PortfolioModel.findById(portfolioId).lean()
+    const portfolio = await getPortfolioById(portfolioId)
 
     if (!portfolio) {
       return createErrorResponse('Portfolio not found', 404)
     }
 
-    return createSuccessResponse({
-      ...portfolio,
-      _id: portfolio._id.toString(),
-    })
+    return createSuccessResponse(portfolio)
   } catch (error) {
     return handleError(error, 'fetching portfolio')
   }
