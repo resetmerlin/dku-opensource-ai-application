@@ -97,7 +97,7 @@ export async function createPortfolioHandler(request: NextRequest) {
         name: userName.fullName ?? '',
         title: preview.profile?.title || 'Professional',
         bio: preview.profile?.bio || '',
-        avatar: preview.profile?.avatar || '',
+        avatar: userName.imageUrl || preview.profile?.avatar || '',
         stats: {
           yearsOfCareer: preview.profile?.stats?.yearsOfCareer || 0,
           projects: preview.profile?.stats?.projects || 0,
