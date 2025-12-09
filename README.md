@@ -2,6 +2,16 @@
 
 **proFound** is an open-source AI-powered recruiting platform that revolutionizes the hiring process by leveraging artificial intelligence to match candidates with opportunities more effectively.
 
+
+https://github.com/user-attachments/assets/b2cf84c6-a6f1-43fa-a9c1-0d8453c91543
+
+
+https://github.com/user-attachments/assets/65f4fb6a-ae09-4525-862b-2d0181b905da
+
+
+https://github.com/user-attachments/assets/9e4b4ae5-3701-4c22-952c-1609c4b88818
+
+
 ## About proFound
 
 proFound is a modern recruiting platform that uses advanced AI technology to streamline the hiring process for both employers and job seekers. The platform provides intelligent candidate matching, automated portfolio generation, and data-driven insights to make recruitment more efficient and effective.
