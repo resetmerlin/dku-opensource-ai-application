@@ -1,8 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# proFound - Modern AI Recruiting Platform
+
+**proFound** is an open-source AI-powered recruiting platform that revolutionizes the hiring process by leveraging artificial intelligence to match candidates with opportunities more effectively.
+
+## About proFound
+
+proFound is a modern recruiting platform that uses advanced AI technology to streamline the hiring process for both employers and job seekers. The platform provides intelligent candidate matching, automated portfolio generation, and data-driven insights to make recruitment more efficient and effective.
+
+### Key Features
+
+- **AI-Powered Candidate Matching**: Intelligent algorithms analyze skills, experience, and requirements to find the best matches
+- **Automated Portfolio Generation**: Automatically generate professional PDF portfolios from candidate profiles
+- **Smart Skill Analysis**: AI-driven skill assessment and recommendations
+- **Career Timeline Tracking**: Visual representation of candidate career progression
+- **Project Showcase**: Highlight featured projects and achievements
+- **Real-time Analytics**: Data-driven insights for better hiring decisions
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ or Bun
+- npm, yarn, pnpm, or bun package manager
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-repo/dku-opensource-ai-application.git
+cd dku-opensource-ai-application
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+3. Set up environment variables:
+
+```bash
+cp .env.example .env.local
+```
+
+Configure your environment variables in `.env.local`
+
+4. Run the development server:
 
 ```bash
 npm run dev
@@ -14,23 +63,40 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) to see the application
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### For Recruiters
 
-## Learn More
+- Post job openings with detailed requirements
+- Browse AI-matched candidate profiles
+- Review automatically generated portfolios
+- Track candidate engagement and progress
 
-To learn more about Next.js, take a look at the following resources:
+### For Job Seekers
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Create comprehensive profiles with skills and experience
+- Showcase projects and achievements
+- Get AI-powered skill recommendations
+- Generate professional portfolios automatically
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Open Source
 
-## Deploy on Vercel
+This project is open source and welcomes contributions from the community. Whether you're fixing bugs, adding features, or improving documentation, your contributions are appreciated.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+We welcome contributions! Please feel free to submit issues, feature requests, or pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For questions, issues, or feature requests, please open an issue on GitHub.
+
+---
+
+Built with modern AI technology to transform the recruiting experience.
