@@ -1,8 +1,10 @@
 // lib/renderPortfolioHtml.ts
 import type { PortfolioDocument } from '@/types/portfolio'
 
-function escapeHtml(value: string): string {
-  return value
+function escapeHtml(value: string | number | null | undefined): string {
+  if (value == null) return ''
+  const str = String(value)
+  return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -152,7 +154,7 @@ export function renderPortfolioHtml(doc: PortfolioDocument): string {
           ${
             profile.avatar
               ? `<img src="${escapeHtml(
-                  profile
+                  profile.avatar
                 )}" alt="${escapeHtml(profile.name)}" class="w-full h-full object-cover object-top">`
               : ''
           }
